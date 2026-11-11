@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#10172a">
+  <meta name="description" content="GAME CHALLENGE : quiz, énigmes et vrai ou faux.">
+  <title>GAME CHALLENGE</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <style>
+    :root{color-scheme:dark;--bg:#0b1020;--panel:#151e34;--panel2:#1c2945;--ink:#f5f7ff;--muted:#aab5cf;--cyan:#55d6ff;--gold:#ffd166;--green:#63df9a;--red:#ff758f}
+    *{box-sizing:border-box} body{margin:0;background:radial-gradient(ellipse at top,#1b2c50 0,#0b1020 58%);color:var(--ink);font:16px system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100vh}
+    button{font:inherit;cursor:pointer} .wrap{width:min(760px,100%);margin:auto;padding:20px 16px 42px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:8px 0 22px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:.7px}.logo{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#55d6ff,#7b72ff);display:grid;place-items:center;color:#091126;font-weight:1000;font-size:22px}
+    .small{color:var(--muted);font-size:13px}.pill{border:1px solid #344362;border-radius:999px;padding:8px 12px;color:var(--gold);font-weight:700;white-space:nowrap}
+    .hero{padding:23px;border-radius:24px;background:linear-gradient(135deg,#233e68,#252b58 65%,#392d67);box-shadow:0 18px 45px #0005;margin-bottom:18px}
+    h1{font-size:clamp(28px,7vw,42px);line-height:1.05;margin:0 0 10px}.hero p{color:#dce6ff;margin:0 0 18px}
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.stat{background:#0b1530a8;border:1px solid #ffffff20;border-radius:16px;padding:12px}.stat strong{display:block;font-size:22px}.stat span{font-size:12px;color:#c4cee5}
+    .section-title{font-size:19px;margin:24px 2px 12px}.games{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    .game{border:1px solid #344362;background:linear-gradient(145deg,#1a2742,#121a2d);border-radius:19px;padding:17px;text-align:left;color:var(--ink);min-height:145px;transition:transform .15s,border-color .15s}
+    .game:active{transform:scale(.98)}.game:hover{border-color:var(--cyan)}.emoji{font-size:29px;display:block;margin-bottom:10px}.game b{font-size:17px;display:block;margin-bottom:4px}.game small{color:var(--muted);line-height:1.35}
+    .panel{background:var(--panel);border:1px solid #2c3b5b;border-radius:22px;padding:19px;margin-top:14px}
+    .topline{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:15px}.back{background:transparent;color:var(--cyan);border:0;padding:8px 0;font-weight:700}
+    .progress{height:8px;background:#2b3853;border-radius:99px;overflow:hidden;margin:10px 0 18px}.bar{height:100%;background:linear-gradient(90deg,var(--cyan),#8b80ff);width:0;transition:width .2s}
+    .question{font-size:22px;font-weight:800;line-height:1.3;margin:12px 0 20px}.answers{display:grid;gap:10px}
+    .answer{width:100%;text-align:left;border:1px solid #3a4a6b;background:var(--panel2);color:var(--ink);border-radius:14px;padding:14px}
+    .answer:disabled{opacity:1}.answer.correct{border-color:var(--green);background:#164333}.answer.wrong{border-color:var(--red);background:#4b2331}
+    .feedback{padding:13px;border-radius:13px;margin-top:14px;background:#26334d;color:#e5edff;line-height:1.45}.feedback.good{border:1px solid #397d5b}.feedback.bad{border:1px solid #8b4053}
+    .primary,.secondary{border:0;border-radius:14px;padding:13px 17px;font-weight:800}.primary{background:linear-gradient(90deg,#55d6ff,#9b8cff);color:#091126;width:100%;margin-top:15px}.secondary{background:#293957;color:var(--ink)}
+    .hidden{display:none!important}.levelbar{height:9px;background:#293650;border-radius:99px;overflow:hidden;margin-top:8px}.levelbar div{height:100%;background:var(--gold)}
+    footer{text-align:center;color:#8492b1;font-size:12px;margin-top:25px}.notice{font-size:13px;color:var(--muted);line-height:1.5}
+    @media(max-width:380px){.games{grid-template-columns:1fr}.stats{gap:6px}.stat{padding:10px}.stat strong{font-size:19px}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><div class="logo">G</div><div>GAME CHALLENGE<div class="small">Joue. Réfléchis. Progresse.</div></div></div>
+    <div class="pill" id="levelPill">Niveau 1</div>
+  </header>
+
+  <main id="home">
+    <section class="hero">
+      <h1>Prêt à relever le défi ?</h1>
+      <p>Teste tes connaissances, résous des énigmes et accumule des points.</p>
+      <div class="stats">
+        <div class="stat"><strong id="score">0</strong><span>Points</span></div>
+        <div class="stat"><strong id="played">0</strong><span>Questions jouées</span></div>
+        <div class="stat"><strong id="best">0</strong><span>Bonnes réponses</span></div>
+      </div>
+    </section>
+
+    <h2 class="section-title">Choisis ton défi</h2>
+    <div class="games">
+      <button class="game" data-mode="quiz"><span class="emoji">🌍</span><b>Quiz culture générale</b><small>Histoire, sciences, géographie et culture.</small></button>
+      <button class="game" data-mode="riddle"><span class="emoji">🧩</span><b>Énigmes</b><small>Fais travailler tes méninges.</small></button>
+      <button class="game" data-mode="tf"><span class="emoji">⚡</span><b>Vrai ou faux</b><small>Décide rapidement si l'affirmation est vraie.</small></button>
+      <button class="game" data-mode="mix"><span class="emoji">🎯</span><b>Défi surprise</b><small>Un mélange des trois catégories.</small></button>
+    </div>
+    <section class="panel">
+      <div class="topline"><b>Ta progression</b><span class="small" id="nextLevel">100 points pour le niveau 2</span></div>
+      <div class="levelbar"><div id="levelProgress" style="width:0%"></div></div>
+      <p class="notice" id="progressText">Réponds correctement pour gagner 10 points par question.</p>
+    </section>
+    <p class="notice">Les scores sont enregistrés sur cet appareil. Cette première version fonctionne sans compte et sans connexion après son premier chargement.</p>
+  </main>
+
+  <main id="play" class="hidden">
+    <div class="topline"><button class="back" id="backBtn">← Accueil</button><span class="pill" id="modeName">Quiz</span></div>
+    <div class="panel">
+      <div class="topline"><span class="small" id="questionCount">Question 1/10</span><b id="roundScore">0 point</b></div>
+      <div class="progress"><div class="bar" id="progressBar"></div></div>
+      <div class="question" id="question">Question</div>
+      <div class="answers" id="answers"></div>
+      <div id="feedback" class="feedback hidden" aria-live="polite"></div>
+      <button id="nextBtn" class="primary hidden">Question suivante</button>
+    </div>
+  </main>
+
+  <main id="result" class="hidden">
+    <section class="hero">
+      <div class="small">DÉFI TERMINÉ</div>
+      <h1 id="resultTitle">Bien joué !</h1>
+      <p id="resultMessage">Voici ton résultat.</p>
+      <div class="stats">
+        <div class="stat"><strong id="earned">0</strong><span>Points gagnés</span></div>
+        <div class="stat"><strong id="right">0/10</strong><span>Bonnes réponses</span></div>
+        <div class="stat"><strong id="totalScore">0</strong><span>Total des points</span></div>
+      </div>
+    </section>
+    <button class="primary" id="againBtn">Rejouer</button>
+    <button class="secondary" id="homeBtn" style="width:100%;margin-top:10px">Retour à l'accueil</button>
+  </main>
+  <footer>GAME CHALLENGE • Prototype 1.0 • Créé pour apprendre et s'amuser</footer>
+</div>
+<script>
+const BANK = {
+ quiz:[
+  {q:"Quelle est la capitale de la Côte d’Ivoire ?",a:["Yamoussoukro","Abidjan","Bouaké","Daloa"],c:0,e:"Yamoussoukro est la capitale politique et administrative de la Côte d’Ivoire."},
+  {q:"Combien de côtés possède un hexagone ?",a:["5","6","7","8"],c:1,e:"Un hexagone possède six côtés."},
+  {q:"Quelle planète est surnommée la planète rouge ?",a:["Vénus","Jupiter","Mars","Mercure"],c:2,e:"Mars paraît rougeâtre à cause des oxydes de fer présents à sa surface."},
+  {q:"Quel océan borde la côte sud de la Côte d’Ivoire ?",a:["Atlantique","Indien","Pacifique","Arctique"],c:0,e:"La Côte d’Ivoire est bordée par le golfe de Guinée, dans l’océan Atlantique."},
+  {q:"Combien de minutes y a-t-il dans 2 heures ?",a:["60","90","120","180"],c:2,e:"Une heure compte 60 minutes : 2 × 60 = 120."},
+  {q:"Quel organe permet principalement de pomper le sang ?",a:["Le foie","Le cœur","Le poumon","Le rein"],c:1,e:"Le cœur propulse le sang dans les vaisseaux sanguins."},
+  {q:"Quel est le plus grand continent ?",a:["Afrique","Europe","Asie","Océanie"],c:2,e:"L’Asie est le plus vaste continent."},
+  {q:"Quel gaz les plantes absorbent-elles principalement pour la photosynthèse ?",a:["Oxygène","Dioxyde de carbone","Azote","Hélium"],c:1,e:"Les plantes utilisent le dioxyde de carbone, l’eau et la lumière pour fabriquer leur matière organique."},
+  {q:"Combien font 9 × 7 ?",a:["56","63","72","79"],c:1,e:"9 multiplié par 7 donne 63."},
+  {q:"Quel instrument possède généralement 88 touches ?",a:["Guitare","Flûte","Piano","Tambour"],c:2,e:"Un piano standard possède 88 touches."},
+  {q:"Dans quel pays se trouve la ville de Dakar ?",a:["Sénégal","Mali","Ghana","Bénin"],c:0,e:"Dakar est la capitale du Sénégal."},
+  {q:"Quel est l’état de l’eau à 0 °C, à pression atmosphérique normale, au point de fusion ?",a:["Toujours gazeux","Solide et liquide peuvent coexister","Toujours plasma","Métallique"],c:1,e:"À son point de fusion, glace et eau liquide peuvent coexister."}
+ ],
+ riddle:[
+  {q:"Je peux être cassé sans être touché. Qui suis-je ?",a:["Un verre","Une promesse","Un caillou","Un miroir"],c:1,e:"On peut rompre une promesse sans la toucher."},
+  {q:"Plus je sèche, plus je deviens mouillée. Qui suis-je ?",a:["Une serviette","Le soleil","Une éponge sèche","Une chaussure"],c:0,e:"La serviette absorbe l’eau en séchant quelqu’un ou quelque chose."},
+  {q:"J'ai des aiguilles mais je ne couds pas. Qui suis-je ?",a:["Un hérisson","Une horloge","Un sapin","Un cactus"],c:1,e:"Une horloge possède des aiguilles pour indiquer l’heure."},
+  {q:"Qu'est-ce qui monte mais ne descend jamais ?",a:["Un ballon","La fumée","L'âge","Un ascenseur"],c:2,e:"L'âge augmente au fil du temps."},
+  {q:"Je suis plein de trous mais je retiens l'eau. Qui suis-je ?",a:["Un filet","Une éponge","Un panier","Un tamis"],c:1,e:"Une éponge contient des trous et absorbe l’eau."},
+  {q:"Quel mois de l'année a 28 jours ?",a:["Février seulement","Tous les mois","Avril","Juin"],c:1,e:"Tous les mois ont au moins 28 jours."},
+  {q:"Je parle sans bouche et j'entends sans oreilles. Qui suis-je ?",a:["Un écho","Un livre","Un nuage","Un téléphone éteint"],c:0,e:"L’écho répète un son lorsqu’il se réfléchit."},
+  {q:"Plus on m'enlève, plus je deviens grand. Qui suis-je ?",a:["Un trou","Un sac","Un arbre","Un nuage"],c:0,e:"Un trou grandit lorsqu’on enlève de la matière autour."}
+ ],
+ tf:[
+  {q:"La Terre tourne autour du Soleil.",a:["Vrai","Faux"],c:0,e:"La Terre effectue une révolution autour du Soleil en environ un an."},
+  {q:"Un triangle possède quatre côtés.",a:["Vrai","Faux"],c:1,e:"Un triangle possède trois côtés."},
+  {q:"L'eau pure bout vers 100 °C au niveau de la mer.",a:["Vrai","Faux"],c:0,e:"C’est sa température d’ébullition approximative à pression atmosphérique normale."},
+  {q:"Abidjan est la capitale politique de la Côte d’Ivoire.",a:["Vrai","Faux"],c:1,e:"Yamoussoukro est la capitale politique ; Abidjan est la capitale économique."},
+  {q:"Les araignées ont huit pattes.",a:["Vrai","Faux"],c:0,e:"Les araignées sont des arachnides et possèdent huit pattes."},
+  {q:"Le Soleil est une planète.",a:["Vrai","Faux"],c:1,e:"Le Soleil est une étoile."},
+  {q:"L’Afrique est traversée par l’équateur.",a:["Vrai","Faux"],c:0,e:"L’équateur traverse plusieurs pays africains."},
+  {q:"Le son se propage dans le vide.",a:["Vrai","Faux"],c:1,e:"Le son a besoin d’un milieu matériel pour se propager."},
+  {q:"12 est un nombre premier.",a:["Vrai","Faux"],c:1,e:"12 possède plusieurs diviseurs autres que 1 et lui-même."},
+  {q:"Les abeilles contribuent à la pollinisation.",a:["Vrai","Faux"],c:0,e:"En transportant le pollen, les abeilles aident de nombreuses plantes à se reproduire."}
+ ]
+};
+const $=id=>document.getElementById(id);
+let state=loadState(), mode="quiz", questions=[], index=0, roundRight=0, roundEarned=0, answered=false;
+function loadState(){try{return JSON.parse(localStorage.getItem("gc_state"))||{score:0,played:0,best:0}}catch(e){return {score:0,played:0,best:0}}}
+function save(){localStorage.setItem("gc_state",JSON.stringify(state));updateHome()}
+function level(){return Math.floor(state.score/100)+1}
+function updateHome(){
+ $("score").textContent=state.score;$("played").textContent=state.played;$("best").textContent=state.best;
+ $("levelPill").textContent="Niveau "+level();
+ const into=state.score%100;$("levelProgress").style.width=into+"%";
+ $("nextLevel").textContent=(100-into)+" points pour le niveau "+(level()+1);
+ $("progressText").textContent=into+" / 100 points vers le prochain niveau.";
+}
+function show(which){["home","play","result"].forEach(x=>$(x).classList.toggle("hidden",x!==which))}
+function shuffle(arr){let a=[...arr];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function start(m){
+ mode=m;let source=m==="mix"?[...BANK.quiz,...BANK.riddle,...BANK.tf]:BANK[m];
+ questions=shuffle(source).slice(0,10);index=0;roundRight=0;roundEarned=0;
+ $("modeName").textContent=({quiz:"🌍 Culture générale",riddle:"🧩 Énigmes",tf:"⚡ Vrai ou faux",mix:"🎯 Défi surprise"})[m];
+ show("play");renderQuestion();
+}
+function renderQuestion(){
+ answered=false;let item=questions[index];
+ $("questionCount").textContent=`Question ${index+1}/${questions.length}`;
+ $("roundScore").textContent=roundEarned+" point(s)";
+ $("progressBar").style.width=(index/questions.length*100)+"%";
+ $("question").textContent=item.q;$("feedback").classList.add("hidden");$("nextBtn").classList.add("hidden");
+ $("answers").innerHTML="";
+ item.a.forEach((label,i)=>{
+  const b=document.createElement("button");b.className="answer";b.textContent=label;b.addEventListener("click",()=>answer(i));$("answers").appendChild(b);
+ });
+}
+function answer(choice){
+ if(answered)return;answered=true;let item=questions[index],correct=choice===item.c;
+ [...$("answers").children].forEach((b,i)=>{b.disabled=true;if(i===item.c)b.classList.add("correct");else if(i===choice)b.classList.add("wrong")});
+ state.played++;if(correct){roundRight++;roundEarned+=10;state.score+=10;state.best++}
+ save();
+ $("feedback").textContent=(correct?"Bonne réponse ! +10 points. ":"Ce n’est pas la bonne réponse. ")+item.e;
+ $("feedback").className="feedback "+(correct?"good":"bad");
+ $("roundScore").textContent=roundEarned+" point(s)";
+ $("nextBtn").textContent=index===questions.length-1?"Voir mon résultat":"Question suivante";
+ $("nextBtn").classList.remove("hidden");
+}
+function finish(){
+ $("progressBar").style.width="100%";$("earned").textContent=roundEarned;$("right").textContent=roundRight+"/"+questions.length;$("totalScore").textContent=state.score;
+ $("resultTitle").textContent=roundRight>=8?"Excellent travail !":roundRight>=5?"Bien joué !":"Continue tes efforts !";
+ $("resultMessage").textContent=`Tu as obtenu ${roundRight} bonne(s) réponse(s) sur ${questions.length}.`;
+ show("result");
+}
+document.querySelectorAll("[data-mode]").forEach(b=>b.addEventListener("click",()=>start(b.dataset.mode)));
+$("nextBtn").addEventListener("click",()=>{index++;if(index<questions.length)renderQuestion();else finish()});
+$("backBtn").addEventListener("click",()=>{show("home");updateHome()});
+$("homeBtn").addEventListener("click",()=>{show("home");updateHome()});
+$("againBtn").addEventListener("click",()=>start(mode));
+updateHome();show("home");
+if("serviceWorker" in navigator && location.protocol.startsWith("http")){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}))}
+</script>
+</body>
+</html>
